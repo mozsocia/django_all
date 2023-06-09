@@ -86,3 +86,46 @@ def create_post(request):
     </form>
 
 ```
+
+
+```html
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+        {% if field.is_hidden %}
+            {{ field }}
+        {% else %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="custom-error-class">
+                        {% for error in field.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if field.help_text %}
+                    <span class="helper-text">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+        <div class="custom-error-class">
+            {% for error in form.non_field_errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <button type="submit">Create</button>
+</form>
+```

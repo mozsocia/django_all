@@ -49,6 +49,18 @@ def create_post(request):
 ```
 
 ```html
+    {% if form_errors %}
+    <ul class="errors">
+        {% for field, field_errors in form_errors.items %}
+        {% for error in field_errors %}
+        <li>{{ field }}: {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+```
+
+```html
   <form method="post">
             {% csrf_token %}
     

@@ -17,7 +17,7 @@ project_name/
     │   │       ├── header.html
     │   │       └── footer.html
     │   └── pages/
-    │       ├── empty_base_page.html
+    │       ├── _empty_base_page.html
     │       ├── index.html
     │       ├── about.html
     │       └── contact.html

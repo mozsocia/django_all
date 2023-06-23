@@ -154,24 +154,27 @@ In your HTML template, create a file named `update_product.html` and use the fol
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Update Product</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Update Product: {{ product.name }}</h1>
     {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
+    <ul class="messages">
+      {% for message in messages %}
+      <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+        {{ message }}</li>
+      {% endfor %}
+    </ul>
     {% endif %}
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Update">
+      {% csrf_token %}
+      <label for="id_name">Name:</label>
+      <input type="text" name="name" id="id_name"
+        value="{{ form.instance.name }}" required>
+      <input type="submit" value="Update">
     </form>
-</body>
+  </body>
 </html>
 ```
 

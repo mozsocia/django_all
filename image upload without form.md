@@ -96,6 +96,67 @@ Remember to configure your Django project's `urls.py` to include this app's URLs
 ---
 ---
 
+Certainly! Here's an updated version of the Django app that uses a `forms.Form` to validate the input:
+
+**forms.py**
+```python
+from django import forms
+
+class ImageUploadForm(forms.Form):
+    title = forms.CharField(max_length=255)
+    image = forms.ImageField()
+```
+
+**views.py**
+```python
+from django.shortcuts import render, redirect
+from .forms import ImageUploadForm
+from .models import Image
+
+
+def image_upload(request):
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            image_file = form.cleaned_data['image']
+            Image.objects.create(title=title, image=image_file)
+            return redirect('image_app:image_list')
+    else:
+        form = ImageUploadForm()
+    
+    return render(request, 'image_app/image_upload.html', {'form': form})
+```
+
+**image_upload.html**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Upload</title>
+</head>
+<body>
+    <h1>Image Upload</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="id_title">Title:</label>
+        <input type="text" name="title" id="id_title" required><br><br>
+        <label for="id_image">Image:</label>
+        <input type="file" name="image" id="id_image" required><br><br>
+        <input type="submit" value="Upload">
+    </form>
+    <a href="{% url 'image_list' %}">Back to Image List</a>
+</body>
+</html>
+
+```
+
+
+
+
+----
+---
+
 
 
 To set the `MEDIA_ROOT` and `MEDIA_URL` in Django, follow these steps:

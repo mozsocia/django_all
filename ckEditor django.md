@@ -62,7 +62,7 @@ def my_model_create(request):
     <button type="submit">Create</button>
 </form>
 
-<script src="{% static 'ckeditor/ckeditor.js' %}"></script>
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace('ckeditor');
 </script>

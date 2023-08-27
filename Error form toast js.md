@@ -5,13 +5,14 @@
   Whoops! Something went wrong.
 </div>
 
-<div class="row d-fex justify-content-center mt-3">
-  <div class="col-md-6 dip">
-    <ul class="mt-3 list-group list-group-light text-danger">
+
+<div class="session-alert  alert alert-danger alert-details">
+  <div >
+    <ul class="p-1 text-danger">
 
       {% for field, field_errors in form.errors.items %}
       {% for error in field_errors %}
-      <li>{{ field }}: {{ error }}</li>
+      <li >{{ field }}: {{ error }}</li>
       {% endfor %}
       {% endfor %}
 
@@ -31,6 +32,11 @@
     right: 20px;
     z-index: 9999;
     opacity: .9;
+  }
+  .alert-details {
+    top: 70px;
+    padding: 10px;
+    padding-left: 30px;
   }
 </style>
 ```

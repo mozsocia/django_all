@@ -58,7 +58,7 @@ def my_model_create(request):
 ```html
 <form method="POST" action="{% url 'my_model_create' %}">
     {% csrf_token %}
-    <textarea name="content" id="ckeditor" rows="10" cols="80"></textarea>
+    <textarea name="content" class="ckeditor" rows="10" cols="80"></textarea>
     <button type="submit">Create</button>
 </form>
 

@@ -101,13 +101,18 @@ def update_post(request, post_id):
 
     <div class="mb-3">
         <label class="form-label">Full Name</label>
-        <input type="text" name="{{ form.full_name.html_name }}" class="form-control "/>
+        <input type="text" name="full_name" class="form-control "/>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="{{ form.full_name.name }}" class="form-control "/>
     </div>
 
 
     <div class="mb-3">
         <label class="form-label">{{ form.full_name.label }}</label>
-        <input type="text" name="{{ form.full_name.html_name }}" class="form-control "/>
+        <input type="text" name="{{ form.full_name.name }}" class="form-control "/>
     </div>
 
 
@@ -123,7 +128,7 @@ def update_post(request, post_id):
 
     <div class="mb-3 {% if form.title.errors %} has-error {% endif %}">
         <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
-        <input type="text" name="{{ form.title.html_name }}" class="form-control " id="{{ form.title.id_for_label }}" />
+        <input type="text" name="{{ form.title.name }}" class="form-control " id="{{ form.title.id_for_label }}" />
       
         {% if form.title.errors %}
         <div class="invalid-feedback custom-error-class">
@@ -146,19 +151,33 @@ def update_post(request, post_id):
 
   <div class="form-group ">
         <label >Full Name</label>
-        <input type="text" name="{{ form.full_name.html_name }}" class="form-control"/>  
+        <input type="text" name="full_name" class="form-control"/>  
+  </div>
+
+  <div class="form-group ">
+        <label >Full Name</label>
+        <input type="text" name="{{ form.full_name.name }}" class="form-control"/>  
   </div>
 
   <div class="form-group ">
         <label >{{ form.full_name.label }}</label>
-        <input type="text" name="{{ form.full_name.html_name }}" class="form-control"/>  
+        <input type="text" name="{{ form.full_name.name }}" class="form-control"/>  
   </div>
 
+
+    <div class="form-group">
+        <label >User</label>
+        <select class="form-select"  name="{{ form.user.name }}" required>
+            {% for user_choice in form.user.field.choices %}
+                <option value="{{ user_choice.0 }}" >{{ user_choice.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
 
     <div class="form-group {% if form.title.errors %}has-error{% endif %}">
         <label for="{{ form.title.id_for_label }}" >{{ form.title.label }}</label>
-        <input type="text" name="{{ form.title.html_name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
+        <input type="text" name="{{ form.title.name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
       
         {% if form.title.errors %}
         <div class="invalid-feedback ">
@@ -186,25 +205,25 @@ def update_post(request, post_id):
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
-        <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.full_name.label }}</label>
-            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
-        </div>
+    <div class="mb-3">
+        <label class="form-label">{{ form.full_name.label }}</label>
+        <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+    </div>
 
 
-        <div class="mb-3">
-            <label class="form-label">User</label>
-            <select class="form-select"  name="{{ form.user.name }}" required>
-                {% for user_choice in form.user.field.choices %}
-                    <option value="{{ user_choice.0 }}" {% if user_choice.0 == form.user.value %}selected{% endif %}>{{ user_choice.1 }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">User</label>
+        <select class="form-select"  name="{{ form.user.name }}" required>
+            {% for user_choice in form.user.field.choices %}
+                <option value="{{ user_choice.0 }}" {% if user_choice.0 == form.user.value %}selected{% endif %}>{{ user_choice.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
 
 
@@ -230,18 +249,33 @@ def update_post(request, post_id):
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <div class="form-group">
+        <label >Full Name</label>
+        <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+    </div>
+
+
+  <div class="form-group">
+        <label >User</label>
+        <select class="form-select"  name="{{ form.user.name }}" required>
+            {% for user_choice in form.user.field.choices %}
+                <option value="{{ user_choice.0 }}" {% if user_choice.0 == form.user.value %}selected{% endif %}>{{ user_choice.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
     
-        <div class="form-group">
-            <label for="{{ form.full_name.id_for_label }}" >Full Name</label>
-            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
-            {% if form.full_name.errors %}
-                <div class="invalid-feedback">
-                    {% for error in form.full_name.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+    <div class="form-group">
+        <label for="{{ form.full_name.id_for_label }}" >Full Name</label>
+        <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+        {% if form.full_name.errors %}
+            <div class="invalid-feedback">
+                {% for error in form.full_name.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
     
     <!-- Repeat the above block for other fields -->
     

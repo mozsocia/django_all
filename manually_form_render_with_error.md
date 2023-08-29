@@ -98,6 +98,14 @@ bootstrap 4 ===========
 <form method="post">
     {% csrf_token %}
 
+  <div class="form-group ">
+        <label class="form-label">{{ form.title.label }}</label>
+        <input type="text" name="{{ form.title.html_name }}" class="form-control"/>
+       
+    </div>
+
+
+
     <div class="form-group {% if form.title.errors %}has-error{% endif %}">
         <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
         <input type="text" name="{{ form.title.html_name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
@@ -112,6 +120,7 @@ bootstrap 4 ===========
       
     </div>
 
+ 
 
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
@@ -120,6 +129,14 @@ bootstrap 5 ===========
 
 <form method="post">
     {% csrf_token %}
+
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.title.label }}</label>
+        <input type="text" name="{{ form.title.html_name }}" class="form-control "/>
+      
+    </div>
+
 
     <div class="mb-3 {% if form.title.errors %} has-error {% endif %}">
         <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>

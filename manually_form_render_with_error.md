@@ -19,16 +19,31 @@ from django import forms
 from .models import Post
 
 class PostForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.TextInput):
+                field.widget.attrs['class'] = 'text-input-class'
+            elif isinstance(field.widget, forms.Textarea):
+                field.widget.attrs['class'] = 'textarea-class'
+            elif isinstance(field.widget, forms.Select):
+                field.widget.attrs['class'] = 'select-class'
+                
+            # Check for errors and add a special class to fields with errors
+            if self.errors.get(field_name):
+                field.widget.attrs['class'] += ' error-class'
+
     class Meta:
         model = Post
         fields = ('title', 'content')
 
-
+```
+```py
 from django.shortcuts import render, redirect
 from .forms import PostForm
-```
 
-```py
 urlpatterns = [
     path('create/', create_post, name='create_post'),
 ]
@@ -46,12 +61,28 @@ def create_post(request):
     return render(request, 'create_post.html', {'form': form})
 
 
+from django.shortcuts import get_object_or_404
+
+def update_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', post_id=post.id)  # Redirect to the post detail view
+    else:
+        form = PostForm(instance=post)
+    
+    return render(request, 'update_post.html', {'form': form})
+
 ```
 
+error showing -->
 ```html
-    {% if form_errors %}
+    {% if form.errors %}
     <ul class="errors">
-        {% for field, field_errors in form_errors.items %}
+        {% for field, field_errors in form.errors.items %}
         {% for error in field_errors %}
         <li>{{ field }}: {{ error }}</li>
         {% endfor %}
@@ -60,46 +91,107 @@ def create_post(request):
     {% endif %}
 ```
 
+create_post.html -->
 ```html
-  <form method="post">
+
+bootstrap 4 ===========
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-group {% if form.title.errors %}has-error{% endif %}">
+        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+        <input type="text" name="{{ form.title.html_name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
+      
+        {% if form.title.errors %}
+        <div class="invalid-feedback ">
+            {% for error in form.title.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+      
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+bootstrap 5 ===========
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3 {% if form.title.errors %} has-error {% endif %}">
+        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+        <input type="text" name="{{ form.title.html_name }}" class="form-control " id="{{ form.title.id_for_label }}" />
+      
+        {% if form.title.errors %}
+        <div class="invalid-feedback custom-error-class">
+            {% for error in form.title.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+      
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+```
+
+update_post.html --> 
+
+```html
+bootstrap 5 ======
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-    
-            <div class="form-group {% if form.title.errors %} has-error {% endif %}">
-              
-                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-                <input type="text" name="{{ form.title.html_name }}" class="my-class" id="{{ form.title.id_for_label }}" />
-              
-                {% if form.title.errors %}
-                <div class="custom-error-class">
-                    {% for error in form.title.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
+            
+                <div class="mb-3">
+                    <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
+                    <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+                    {% if form.full_name.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.full_name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-              
-            </div>
-    
-    
-            <div class="form-group {% if form.content.errors %}has-error{% endif %}">
-              
-                <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
-                <textarea name="{{ form.content.html_name }}" class="my-class" id="{{ form.content.id_for_label }}"></textarea>
-              
-                {% if form.content.errors %}
-                <div class="custom-error-class">
-                    {% for error in form.content.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
+            
+            <!-- Repeat the above block for other fields -->
+            
+            <button type="submit" class="btn btn-primary">Update Payment</button>
+        </form>
+
+bootstrap 4 ======
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+                <div class="form-group">
+                    <label for="{{ form.full_name.id_for_label }}" >Full Name</label>
+                    <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+                    {% if form.full_name.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.full_name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-              
-            </div>
-            <button type="submit">Create</button>
-    </form>
+            
+            <!-- Repeat the above block for other fields -->
+            
+            <button type="submit" class="btn btn-primary">Update Payment</button>
+        </form>
 
 ```
 
 
+================================================
+===============================================
+===============================================
+## full form
 ```html
 
 <form method="post">

@@ -78,7 +78,7 @@ def update_post(request, post_id):
 
 ```
 
-error showing -->
+====================== error showing -->
 ```html
     {% if form.errors %}
     <ul class="errors">
@@ -91,50 +91,33 @@ error showing -->
     {% endif %}
 ```
 
-create_post.html -->
+### create_post.html -->
 ```html
 
-bootstrap 4 ===========
-<form method="post">
-    {% csrf_token %}
-
-  <div class="form-group ">
-        <label class="form-label">{{ form.title.label }}</label>
-        <input type="text" name="{{ form.title.html_name }}" class="form-control"/>
-       
-    </div>
-
-
-
-    <div class="form-group {% if form.title.errors %}has-error{% endif %}">
-        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
-        <input type="text" name="{{ form.title.html_name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
-      
-        {% if form.title.errors %}
-        <div class="invalid-feedback ">
-            {% for error in form.title.errors %}
-            <span>{{ error }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
-      
-    </div>
-
- 
-
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
-
-bootstrap 5 ===========
+======================== bootstrap 5 =======================
 
 <form method="post">
     {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="{{ form.full_name.html_name }}" class="form-control "/>
+    </div>
 
 
     <div class="mb-3">
-        <label class="form-label">{{ form.title.label }}</label>
-        <input type="text" name="{{ form.title.html_name }}" class="form-control "/>
-      
+        <label class="form-label">{{ form.full_name.label }}</label>
+        <input type="text" name="{{ form.full_name.html_name }}" class="form-control "/>
+    </div>
+
+
+    <div class="mb-3">
+        <label class="form-label">User</label>
+        <select class="form-select"  name="{{ form.user.name }}" required>
+            {% for user_choice in form.user.field.choices %}
+                <option value="{{ user_choice.0 }}" >{{ user_choice.1 }}</option>
+            {% endfor %}
+        </select>
     </div>
 
 
@@ -154,53 +137,116 @@ bootstrap 5 ===========
 
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
+
+
+==============================  bootstrap 4 =======================
+
+<form method="post">
+    {% csrf_token %}
+
+  <div class="form-group ">
+        <label >Full Name</label>
+        <input type="text" name="{{ form.full_name.html_name }}" class="form-control"/>  
+  </div>
+
+  <div class="form-group ">
+        <label >{{ form.full_name.label }}</label>
+        <input type="text" name="{{ form.full_name.html_name }}" class="form-control"/>  
+  </div>
+
+
+
+    <div class="form-group {% if form.title.errors %}has-error{% endif %}">
+        <label for="{{ form.title.id_for_label }}" >{{ form.title.label }}</label>
+        <input type="text" name="{{ form.title.html_name }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" />
+      
+        {% if form.title.errors %}
+        <div class="invalid-feedback ">
+            {% for error in form.title.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+      
+    </div>
+
+ 
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+
 ```
 
-update_post.html --> 
+### update_post.html --> 
 
 ```html
-bootstrap 5 ======
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-                <div class="mb-3">
-                    <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
-                    <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
-                    {% if form.full_name.errors %}
-                        <div class="invalid-feedback">
-                            {% for error in form.full_name.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            
-            <!-- Repeat the above block for other fields -->
-            
-            <button type="submit" class="btn btn-primary">Update Payment</button>
-        </form>
+=========================== bootstrap 5 ========================
 
-bootstrap 4 ======
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-                <div class="form-group">
-                    <label for="{{ form.full_name.id_for_label }}" >Full Name</label>
-                    <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
-                    {% if form.full_name.errors %}
-                        <div class="invalid-feedback">
-                            {% for error in form.full_name.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.full_name.label }}</label>
+            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label">User</label>
+            <select class="form-select"  name="{{ form.user.name }}" required>
+                {% for user_choice in form.user.field.choices %}
+                    <option value="{{ user_choice.0 }}" {% if user_choice.0 == form.user.value %}selected{% endif %}>{{ user_choice.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+
+    
+        <div class="mb-3">
+            <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
+            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+            {% if form.full_name.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.full_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
                 </div>
-            
-            <!-- Repeat the above block for other fields -->
-            
-            <button type="submit" class="btn btn-primary">Update Payment</button>
-        </form>
+            {% endif %}
+        </div>
+    
+    <!-- Repeat the above block for other fields -->
+    
+    <button type="submit" class="btn btn-primary">Update Payment</button>
+</form>    
+
+========================  bootstrap 4 ======
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+        <div class="form-group">
+            <label for="{{ form.full_name.id_for_label }}" >Full Name</label>
+            <input type="text" name="{{ form.full_name.name }}" value="{{ form.full_name.value }}" class="form-control">
+            {% if form.full_name.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.full_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    
+    <!-- Repeat the above block for other fields -->
+    
+    <button type="submit" class="btn btn-primary">Update Payment</button>
+</form>
 
 ```
 
@@ -208,6 +254,7 @@ bootstrap 4 ======
 ================================================
 ===============================================
 ===============================================
+
 ## full form
 ```html
 

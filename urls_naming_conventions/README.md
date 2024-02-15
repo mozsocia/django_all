@@ -25,26 +25,27 @@ class PostForm(forms.ModelForm):
 ```py
 # urls.py
 from django.urls import path
-from .views import post_index, post_create, post_store, post_show, post_edit, post_update, post_destroy
+from .views import *
 
 urlpatterns = [
     # Read All
-    path('posts/', post_index, name='post-index'),
+    path('posts/', post_index, name='post_index'),
 
     # Create
-    path('posts/create/', post_create, name='post-create'),
-    path('posts/store/', post_store, name='post-store'),
+    path('posts/create/', post_create, name='post_create'),
+    path('posts/store/', post_store, name='post_store'),
 
     # Read one
-    path('posts/<int:post_id>/', post_show, name='post-show'),
+    path('posts/<int:post_id>/', post_show, name='post_show'),
 
     # Update
-    path('posts/<int:post_id>/edit/', post_edit, name='post-edit'),
-    path('posts/<int:post_id>/update/', post_update, name='post-update'),
+    path('posts/<int:post_id>/edit/', post_edit, name='post_edit'),
+    path('posts/<int:post_id>/update/', post_update, name='post_update'),
 
     # Delete
-    path('posts/<int:post_id>/destroy/', post_destroy, name='post-destroy'),
+    path('posts/<int:post_id>/destroy/', post_destroy, name='post_destroy'),
 ]
+
 
 ```
 
@@ -73,7 +74,7 @@ def post_store(request):
     form = PostForm(request.POST)
     if form.is_valid():
         post = form.save()
-        return redirect('post-show', post_id=post.id)
+        return redirect('post_show', post_id=post.id)
     return render(request, 'create.html', {'form': form})
 
 @require_GET
@@ -93,12 +94,13 @@ def post_update(request, post_id):
     form = PostForm(request.POST, instance=post)
     if form.is_valid():
         form.save()
-        return redirect('post-show', post_id=post.id)
+        return redirect('post_show', post_id=post.id)
     return render(request, 'edit.html', {'form': form, 'post': post})
 
 @require_http_methods(["DELETE"])
 def post_destroy(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     post.delete()
-    return redirect('post-index')
+    return redirect('post_index')
+
 ```

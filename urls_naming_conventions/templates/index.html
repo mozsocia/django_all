@@ -8,10 +8,10 @@
 </head>
 <body>
     <h1>Post List</h1>
-    <a href="{% url 'post-create' %}">Create Posts</a>
+    <a href="{% url 'post_create' %}">Create Posts</a>
     <ul>
         {% for post in posts %}
-            <li><a href="{% url 'post-show' post.id %}">{{ post.title }}</a></li>
+            <li><a href="{% url 'post_show' post.id %}">{{ post.title }}</a></li>
         {% endfor %}
     </ul>
 </body>

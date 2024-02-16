@@ -10,7 +10,8 @@ put this file on `.vscode/tasks.json`
       "command": "python",
       "args": [
         "${workspaceFolder}/manage.py",
-        "runserver"
+        "runserver",
+        "9000"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

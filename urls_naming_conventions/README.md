@@ -1,8 +1,11 @@
+### Url Naming Conventions
+
 **Models**
-```py
+```python
+# models.py
 from django.db import models
 
-class Post(models.Model):
+class Blog(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
 
@@ -11,96 +14,95 @@ class Post(models.Model):
 ```
 
 **forms**
-```py
+```python
+# forms.py
 from django import forms
-from .models import Post
+from .models import Blog
 
-class PostForm(forms.ModelForm):
+class BlogForm(forms.ModelForm):
     class Meta:
-        model = Post
+        model = Blog
         fields = ['title', 'content']
 ```
 
 **urls**
-```py
+```python
 # urls.py
 from django.urls import path
 from .views import *
 
 urlpatterns = [
     # Read All
-    path('posts/', post_index, name='post_index'),
+    path('blogs/', blog_index, name='blog_index'),
 
     # Create
-    path('posts/create/', post_create, name='post_create'),
-    path('posts/store/', post_store, name='post_store'),
+    path('blogs/create/', blog_create, name='blog_create'),
+    path('blogs/store/', blog_store, name='blog_store'),
 
     # Read one
-    path('posts/<int:post_id>/', post_show, name='post_show'),
+    path('blogs/<int:blog_id>/', blog_show, name='blog_show'),
 
     # Update
-    path('posts/<int:post_id>/edit/', post_edit, name='post_edit'),
-    path('posts/<int:post_id>/update/', post_update, name='post_update'),
+    path('blogs/<int:blog_id>/edit/', blog_edit, name='blog_edit'),
+    path('blogs/<int:blog_id>/update/', blog_update, name='blog_update'),
 
     # Delete
-    path('posts/<int:post_id>/destroy/', post_destroy, name='post_destroy'),
+    path('blogs/<int:blog_id>/destroy/', blog_destroy, name='blog_destroy'),
 ]
-
-
 ```
 
-
 **views**
-```py
+```python
 # views.py
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from .forms import PostForm
-from .models import Post
+from .forms import BlogForm
+from .models import Blog
 
 @require_GET
-def post_index(request):
-    posts = Post.objects.all()
-    return render(request, 'index.html', {'posts': posts})
+def blog_index(request):
+    blogs = Blog.objects.all()
+    return render(request, 'index.html', {'blogs': blogs})
 
 @require_GET
-def post_create(request):
-    form = PostForm()
+def blog_create(request):
+    form = BlogForm()
     return render(request, 'create.html', {'form': form})
 
 @require_POST
-def post_store(request):
-    form = PostForm(request.POST)
+def blog_store(request):
+    form = BlogForm(request.POST)
     if form.is_valid():
-        post = form.save()
-        return redirect('post_show', post_id=post.id)
+        blog = form.save()
+        return redirect('blog_show', blog_id=blog.id)
     return render(request, 'create.html', {'form': form})
 
 @require_GET
-def post_show(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    return render(request, 'show.html', {'post': post})
+def blog_show(request, blog_id):
+    blog = get_object_or_404(Blog, pk=blog_id)
+    return render(request, 'show.html', {'blog': blog})
 
 @require_GET
-def post_edit(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    form = PostForm(instance=post)
-    return render(request, 'edit.html', {'form': form, 'post': post})
+def blog_edit(request, blog_id):
+    blog = get_object_or_404(Blog, pk=blog_id)
+    form = BlogForm(instance=blog)
+    return render(request, 'edit.html', {'form': form, 'blog': blog})
 
 @require_http_methods(["PUT", "PATCH"])
-def post_update(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    form = PostForm(request.POST, instance=post)
+def blog_update(request, blog_id):
+    blog = get_object_or_404(Blog, pk=blog_id)
+    form = BlogForm(request.POST, instance=blog)
     if form.is_valid():
         form.save()
-        return redirect('post_show', post_id=post.id)
-    return render(request, 'edit.html', {'form': form, 'post': post})
+        return redirect('blog_show', blog_id=blog.id)
+    return render(request, 'edit.html', {'form': form, 'blog': blog})
 
 @require_http_methods(["DELETE"])
-def post_destroy(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    post.delete()
-    return redirect('post_index')
-
+def blog_destroy(request, blog_id):
+    blog = get_object_or_404(Blog, pk=blog_id)
+    blog.delete()
+    return redirect('blog_index')
 ```
+
+These changes update the model, form, and view names to reflect the change from "Post" to "Blog." Make sure to update your templates and other references accordingly.

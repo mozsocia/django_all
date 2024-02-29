@@ -276,3 +276,134 @@ in view
 def post_blog(request):
     pprint(request.POST)
 ```
+----
+----
+
+### How process array of blog data
+```py
+# mixins.py
+class JsonErrorsMixin:
+    def json_errors(self):
+        return {field: self.errors[field][0] for field in self.errors}
+
+
+# mixins.py
+class ListFormMixin:
+    def __init__(self, data=None, *args, **kwargs):
+        self.is_list_form = isinstance(data, list)
+        
+        if self.is_list_form:
+            self.form_instances = [self.get_form(data=item) for item in data]
+        else:
+            super().__init__(data, *args, **kwargs)
+
+    def is_valid(self):
+        if self.is_list_form:
+            return all(form.is_valid() for form in self.form_instances)
+        else:
+            return super().is_valid()
+
+    def get_errors(self):
+        if self.is_list_form:
+            return [form.errors for form in self.form_instances]
+        else:
+            return super().errors
+
+    def save(self, commit=True):
+        if self.is_list_form:
+            return [form.save(commit) for form in self.form_instances]
+        else:
+            return super().save(commit)
+
+    def get_form(self, data=None, files=None, **kwargs):
+        return self.__class__(data=data, files=files, **kwargs)
+
+
+```
+```py
+from django import forms
+from .models import *
+from .mixins import *
+
+class BlogForm(JsonErrorsMixin,forms.ModelForm):
+    class Meta:
+        model = Blog
+        fields = '__all__'
+
+class BlogListForm(ListFormMixin, BlogForm):
+    pass
+
+```
+
+```py
+
+
+@csrf_exempt
+@process_json_data
+def post_blog(request):
+    if request.method == 'POST':
+        form = BlogListForm(request.json_data)
+
+        if form.is_valid():
+            blogs = form.save()
+            return JsonResponse({'success': True, 'ids': [blog.id for blog in blogs]}, status=201)
+        else:
+            return JsonResponse({'success': False, 'errors': form.get_errors()}, status=400)
+
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'}, status=405)
+
+```
+
+```js
+
+  function submitForm() {
+      // Clear previous errors
+      clearErrors();
+
+      const form = document.getElementById('blogForm');
+      const formData = new FormData(form);
+
+      // Get authentication cookie
+      const csrftoken = getCookie('csrftoken');
+      const sessionid = getCookie('sessionid');
+
+      const blogData = [
+        { "title": "Blog 1", "details": "Details for Blog 1", "email": "one1@gmail.com" },
+        { "title": "Blog 2", "details": "Details for Blog 2", "email": "one2@gmail.com" },
+        { "title": "Blog 3", "details": "Details for Blog 3", "email": "one3@gmail.com" }
+      ];
+
+      fetch('/blogs/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+          'Cookie': `csrftoken=${csrftoken}; sessionid=${sessionid}`
+        },
+        body: JSON.stringify(blogData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            return showAlert('Blog submitted successfully! Blog ID: ' + data.id, 'success');
+          }
+          if (Array.isArray(data.errors)) {
+            return showAlert('Failed to submit blog, invalid data', 'danger');
+
+          }
+          // if sigle data Display errors and create Error tags dynamically
+          Object.keys(data.errors).forEach(fieldName => {
+            const input = form.querySelector(`[name="${fieldName}"]`);
+            const errorParagraph = document.createElement('div');
+            errorParagraph.textContent = data.errors[fieldName];
+            errorParagraph.classList.add('error', 'invalid-feedback');
+            input.insertAdjacentElement('afterend', errorParagraph);
+          });
+
+          showAlert('Failed to submit blog. See errors next to the fields.', 'danger');
+
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+```

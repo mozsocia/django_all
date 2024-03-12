@@ -1,4 +1,6 @@
 ```py
+from django.core.serializers import serialize
+
 def home(request):
     # Fetch the first product from the Product table
     try:

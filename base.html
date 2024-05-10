@@ -10,14 +10,14 @@
   {% endblock css %}
 </head>
 <body>
-    {% include 'header.html' %}
+    {% include 'site/layouts/includes/header.html' %}
     
     <div class="content">
         {% block content %}
         {% endblock %}
     </div>
     
-    {% include 'footer.html' %}
+    {% include 'site/layouts/includes/footer.html' %}
 
     {% block js %}
 

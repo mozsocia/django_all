@@ -329,7 +329,58 @@ def serialize_list_data(queryset, include_reverse_relations=True, max_depth=6):
 #     serialized_tag = serialize_single_data(tag, max_depth=4)
 #     return JsonResponse(serialized_tag)
 
-
+# ===================  new single_data serializer with reverse_relations True for all ==============================
+def serialize_single_data(instance, include_reverse_relations=True, current_depth=0, max_depth=6):
+    if not isinstance(instance, Model):
+        raise ValueError("The instance must be a Django model instance.")
+    
+    if current_depth >= max_depth:
+        return str(instance)
+    
+    data = {}
+    opts = instance._meta
+    
+    for field in opts.get_fields():
+        if field.is_relation:
+            if isinstance(field, ManyToManyField):
+                related_data = getattr(instance, field.name)
+                data[field.name] = [serialize_single_data(obj, include_reverse_relations=True, 
+                                                          current_depth=current_depth+1, max_depth=max_depth) 
+                                    for obj in related_data.all()[:10]]
+            elif isinstance(field, (ForeignKey, OneToOneField)):
+                related_instance = getattr(instance, field.name)
+                if related_instance:
+                    data[field.name] = serialize_single_data(related_instance, include_reverse_relations=True, 
+                                                             current_depth=current_depth+1, max_depth=max_depth)
+                else:
+                    data[field.name] = None
+        else:
+            value = getattr(instance, field.name)
+            if isinstance(value, FieldFile):
+                data[field.name] = value.url if value else None
+            else:
+                data[field.name] = value
+    
+    if include_reverse_relations and current_depth < max_depth - 1:
+        for relation in opts.related_objects:
+            reverse_field_name = relation.get_accessor_name()
+            if hasattr(instance, reverse_field_name):
+                if relation.one_to_one:
+                    related_instance = getattr(instance, reverse_field_name)
+                    if related_instance:
+                        data[reverse_field_name] = serialize_single_data(related_instance, include_reverse_relations=True, 
+                                                                         current_depth=current_depth+1, max_depth=max_depth)
+                    else:
+                        data[reverse_field_name] = None
+                else:
+                    related_queryset = getattr(instance, reverse_field_name)
+                    data[reverse_field_name] = [
+                        serialize_single_data(related_instance, include_reverse_relations=True, 
+                                              current_depth=current_depth+1, max_depth=max_depth)
+                        for related_instance in related_queryset.all()[:10]
+                    ]
+    
+    return data
 
 ## *********************** API POST  helpers ***********************
 

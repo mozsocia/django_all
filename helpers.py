@@ -382,6 +382,80 @@ def serialize_single_data(instance, include_reverse_relations=True, current_dept
     
     return data
 
+
+
+
+# ===================  new single_data serializer with max_depth_for_reverse_relations  ==============================
+def serialize_single_data(instance, include_reverse_relations=True, current_depth=0, max_depth=6, max_depth_for_reverse_relations=1):
+    if not isinstance(instance, Model):
+        raise ValueError("The instance must be a Django model instance.")
+    
+    # Ensure max_depth doesn't exceed 8
+    max_depth = min(max_depth, 8)
+    
+    # Ensure max_depth_for_reverse_relations doesn't exceed 4
+    max_depth_for_reverse_relations = min(max_depth_for_reverse_relations, 4)
+    
+    if current_depth >= max_depth:
+        return str(instance)
+    
+    data = {}
+    opts = instance._meta
+    
+    for field in opts.get_fields():
+        if field.is_relation:
+            if isinstance(field, ManyToManyField):
+                related_data = getattr(instance, field.name)
+                data[field.name] = [serialize_single_data(obj, 
+                                                          include_reverse_relations=include_reverse_relations, 
+                                                          current_depth=current_depth+1, 
+                                                          max_depth=max_depth,
+                                                          max_depth_for_reverse_relations=max_depth_for_reverse_relations) 
+                                    for obj in related_data.all()[:10]]
+            elif isinstance(field, (ForeignKey, OneToOneField)):
+                related_instance = getattr(instance, field.name)
+                if related_instance:
+                    data[field.name] = serialize_single_data(related_instance, 
+                                                             include_reverse_relations=include_reverse_relations, 
+                                                             current_depth=current_depth+1, 
+                                                             max_depth=max_depth,
+                                                             max_depth_for_reverse_relations=max_depth_for_reverse_relations)
+                else:
+                    data[field.name] = None
+        else:
+            value = getattr(instance, field.name)
+            if isinstance(value, FieldFile):
+                data[field.name] = value.url if value else None
+            else:
+                data[field.name] = value
+    
+    if include_reverse_relations and current_depth < max_depth_for_reverse_relations:
+        for relation in opts.related_objects:
+            reverse_field_name = relation.get_accessor_name()
+            if hasattr(instance, reverse_field_name):
+                if relation.one_to_one:
+                    related_instance = getattr(instance, reverse_field_name)
+                    if related_instance:
+                        data[reverse_field_name] = serialize_single_data(related_instance, 
+                                                                         include_reverse_relations=True, 
+                                                                         current_depth=current_depth+1, 
+                                                                         max_depth=max_depth,
+                                                                         max_depth_for_reverse_relations=max_depth_for_reverse_relations)
+                    else:
+                        data[reverse_field_name] = None
+                else:
+                    related_queryset = getattr(instance, reverse_field_name)
+                    data[reverse_field_name] = [
+                        serialize_single_data(related_instance, 
+                                              include_reverse_relations=True, 
+                                              current_depth=current_depth+1, 
+                                              max_depth=max_depth,
+                                              max_depth_for_reverse_relations=max_depth_for_reverse_relations)
+                        for related_instance in related_queryset.all()[:10]
+                    ]
+    
+    return data
+
 ## *********************** API POST  helpers ***********************
 
 

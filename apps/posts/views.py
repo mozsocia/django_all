@@ -1,10 +1,12 @@
 # views.py
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from .forms import BlogForm
-from .models import Blog
+from .models import *
 from django.contrib import messages
+from .serializers import serialize_queryset_to_list, serialize_instance_to_dict
 
 @require_GET
 def blog_list(request):
@@ -56,3 +58,52 @@ def blog_destroy(request, blog_id):
     blog.delete()
     messages.success(request, 'Blog deleted successfully!')
     return redirect('blog_list')
+
+
+
+
+
+def author_list(request):
+    authors = Author.objects.all()
+    # Include books and nested comments in the response
+    data = serialize_queryset_to_list(authors, include_relations=['books', 'books.comments'])
+    return JsonResponse(data, safe=False)
+
+def author_detail(request, pk):
+    try:
+        author = Author.objects.get(pk=pk)
+        # Include books and nested comments in the response
+        data = serialize_instance_to_dict(author, include_relations=['books', 'books.comments'])
+        return JsonResponse(data)
+    except Author.DoesNotExist:
+        return JsonResponse({'error': 'Author not found'}, status=404)
+
+def book_list(request):
+    books = Book.objects.all()
+    # Include author and comments in the response
+    data = serialize_queryset_to_list(books, include_relations=['author', 'comments'])
+    return JsonResponse(data, safe=False)
+
+def book_detail(request, pk):
+    try:
+        book = Book.objects.get(pk=pk)
+        # Include author and comments in the response
+        data = serialize_instance_to_dict(book, include_relations=['author', 'comments'])
+        return JsonResponse(data)
+    except Book.DoesNotExist:
+        return JsonResponse({'error': 'Book not found'}, status=404)
+
+def comment_list(request):
+    comments = Comment.objects.all()
+    # Include book and book's author in the response
+    data = serialize_queryset_to_list(comments, include_relations=['book', 'book.author'])
+    return JsonResponse(data, safe=False)
+
+def comment_detail(request, pk):
+    try:
+        comment = Comment.objects.get(pk=pk)
+        # Include book and book's author in the response
+        data = serialize_instance_to_dict(comment, include_relations=['book', 'book.author'])
+        return JsonResponse(data)
+    except Comment.DoesNotExist:
+        return JsonResponse({'error': 'Comment not found'}, status=404)

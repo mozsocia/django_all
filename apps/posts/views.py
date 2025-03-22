@@ -9,12 +9,12 @@ from django.contrib import messages
 @require_GET
 def blog_list(request):
     blogs = Blog.objects.all()
-    return render(request, 'blog_list.html', {'blogs': blogs})
+    return render(request, 'posts/blog_list.html', {'blogs': blogs})
 
 @require_GET
 def blog_create(request):
     form = BlogForm()
-    return render(request, 'add_blog.html', {'form': form})
+    return render(request, 'posts/add_blog.html', {'form': form})
 
 @require_POST
 def blog_store(request):
@@ -25,18 +25,18 @@ def blog_store(request):
         return redirect('blog_show', blog_id=blog.id)
     else:
         messages.error(request, 'Error creating blog. Please check the form.')
-    return render(request, 'add_blog.html', {'form': form})
+    return render(request, 'posts/add_blog.html', {'form': form})
 
 @require_GET
 def blog_show(request, blog_id):
     blog = get_object_or_404(Blog, pk=blog_id)
-    return render(request, 'blog_show.html', {'blog': blog})
+    return render(request, 'posts/blog_show.html', {'blog': blog})
 
 @require_GET
 def blog_edit(request, blog_id):
     blog = get_object_or_404(Blog, pk=blog_id)
     form = BlogForm(instance=blog)
-    return render(request, 'edit_blog.html', {'form': form, 'blog': blog})
+    return render(request, 'posts/edit_blog.html', {'form': form, 'blog': blog})
 
 @require_POST
 def blog_update(request, blog_id):
@@ -48,7 +48,7 @@ def blog_update(request, blog_id):
         return redirect('blog_show', blog_id=blog.id)
     else:
         messages.error(request, 'Error updating blog. Please check the form.')
-    return render(request, 'edit_blog.html', {'form': form, 'blog': blog})
+    return render(request, 'posts/edit_blog.html', {'form': form, 'blog': blog})
 
 @require_POST
 def blog_destroy(request, blog_id):
